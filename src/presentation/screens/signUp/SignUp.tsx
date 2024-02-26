@@ -31,7 +31,9 @@ const SignUp = ({ navigation }: StackScreenProps) => {
         if (password === confirmPassword) {
             setIsLoading(true);
             try {
-                await viewModel.signUp(fullName, phoneNumber, emailAddress, password);
+                await viewModel
+                    .signUp(fullName, phoneNumber, emailAddress, password)
+                    .then(() => navigation.navigate("signIn"));
             } catch (error) {
                 Alert.alert(String(error));
                 setIsLoading(false);
@@ -69,28 +71,28 @@ const SignUp = ({ navigation }: StackScreenProps) => {
                         return (
                             <>
                                 <View style={styles.inputContainer}>
-                                    <Input
+                                    <Input.Primary
                                         errors={errors.fullName}
                                         label="Full Name"
                                         value={values.fullName}
                                         onChangeText={handleChange("fullName")}
                                         placeholder="Ivanov Ivan"
                                     />
-                                    <Input
+                                    <Input.Primary
                                         errors={errors.phoneNumber}
                                         label="Phone Number"
                                         value={values.phoneNumber}
                                         onChangeText={handleChange("phoneNumber")}
                                         placeholder="+7(999)999-99-99"
                                     />
-                                    <Input
+                                    <Input.Primary
                                         errors={errors.emailAddress}
                                         label="Email Address"
                                         value={values.emailAddress}
                                         onChangeText={handleChange("emailAddress")}
                                         placeholder="***********@mail.com"
                                     />
-                                    <Input
+                                    <Input.Primary
                                         errors={errors.password}
                                         isProtect
                                         label="Password"
@@ -98,7 +100,7 @@ const SignUp = ({ navigation }: StackScreenProps) => {
                                         onChangeText={handleChange("password")}
                                         placeholder="**********"
                                     />
-                                    <Input
+                                    <Input.Primary
                                         errors={errors.confirmPassword}
                                         isProtect
                                         label="Confirm Password"

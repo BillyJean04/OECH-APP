@@ -30,12 +30,4 @@ export class LocalRepositoryImpl implements LocalRepository {
             throw new UnexpectedError();
         }
     }
-
-    async getHashedPassword(): Promise<string | null> {
-        try {
-            return AsyncStorage.getItem("password");
-        } catch (error) {
-            throw new UnexpectedError();
-        }
-    }
 }

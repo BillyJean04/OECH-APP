@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
-import { FC, useState } from "react";
+import { useState } from "react";
 
 interface InputProps extends TextInputProps {
     label: string;
@@ -7,24 +7,38 @@ interface InputProps extends TextInputProps {
     errors?: string;
 }
 
-const Input: FC<InputProps> = ({ label, isProtect = false, errors = "", ...props }) => {
-    const [isHidden, setIsHidden] = useState(false);
-    return (
-        <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
-            <View style={[styles.input, Boolean(errors) && { borderColor: "red" }]}>
-                <TextInput style={[Boolean(errors) && { color: "red" }]} {...props} secureTextEntry={isHidden} />
-                <Pressable onPress={() => setIsHidden(!isHidden)}>
-                    {isProtect &&
-                        (isHidden ? (
-                            <Image source={require("../../../../assets/icons/eye.png")} />
-                        ) : (
-                            <Image source={require("../../../../assets/icons/eye-slash.png")} />
-                        ))}
-                </Pressable>
+const Input = {
+    Primary: ({ label, isProtect = false, errors = "", ...props }: InputProps) => {
+        const [isHidden, setIsHidden] = useState(false);
+        return (
+            <View style={styles.container}>
+                <Text style={styles.label}>{label}</Text>
+                <View style={[styles.input, Boolean(errors) && { borderColor: "red" }]}>
+                    <TextInput style={[Boolean(errors) && { color: "red" }]} {...props} secureTextEntry={isHidden} />
+                    <Pressable onPress={() => setIsHidden(!isHidden)}>
+                        {isProtect &&
+                            (isHidden ? (
+                                <Image source={require("../../../../assets/icons/eye.png")} />
+                            ) : (
+                                <Image source={require("../../../../assets/icons/eye-slash.png")} />
+                            ))}
+                    </Pressable>
+                </View>
             </View>
-        </View>
-    );
+        );
+    },
+    Secondary: ({ ...props }: TextInputProps) => {
+        return (
+            <View style={styles.container}>
+                <View>
+                    <TextInput
+                        {...props}
+                        style={{ elevation: 2, shadowColor: "#00000026", paddingHorizontal: 15, paddingVertical: 15 }}
+                    />
+                </View>
+            </View>
+        );
+    },
 };
 
 const styles = StyleSheet.create({

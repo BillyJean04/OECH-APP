@@ -6,7 +6,7 @@ import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import { Checkbox } from "expo-checkbox";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SignInViewModel } from "./SignInViewModel";
 
 const SigninSchema = Yup.object().shape({
@@ -23,19 +23,14 @@ const SignIn = ({ navigation }: StackScreenProps) => {
     async function handleSubmit(email: string, password: string, rememberPassword: boolean) {
         setIsLoading(true);
         try {
-            const res = await viewModel.signIn(email, password, rememberPassword);
+            await viewModel.signIn(email, password, rememberPassword).then(() => navigation.navigate("home"));
 
-            console.log(res);
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
             Alert.alert(String(error));
         }
     }
-
-    useEffect(() => {
-        viewModel.getExistedPassword().then((res) => setSavedPassword(res));
-    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -54,14 +49,14 @@ const SignIn = ({ navigation }: StackScreenProps) => {
                     {({ handleChange, handleSubmit, values, isValid, dirty, setFieldValue, errors }) => (
                         <>
                             <View style={styles.inputContainer}>
-                                <Input
+                                <Input.Primary
                                     errors={errors.email}
                                     label="Email Address"
                                     onChangeText={handleChange("email")}
                                     value={values.email}
                                     placeholder="***********@mail.com"
                                 />
-                                <Input
+                                <Input.Primary
                                     errors={errors.password}
                                     isProtect
                                     label="Password"
@@ -80,7 +75,12 @@ const SignIn = ({ navigation }: StackScreenProps) => {
                                     <Text style={{ color: "#A7A7A7" }}>Remember password</Text>
                                 </View>
 
-                                <Text style={{ color: "#0560FA", fontWeight: "bold" }}>Forgot Password?</Text>
+                                <Text
+                                    style={{ color: "#0560FA", fontWeight: "bold" }}
+                                    onPress={() => navigation.navigate("forgotPassword")}
+                                >
+                                    Forgot Password?
+                                </Text>
                             </View>
                             <Button.Primary
                                 disabled={!isValid || !dirty}

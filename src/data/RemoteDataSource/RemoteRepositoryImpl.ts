@@ -2,7 +2,6 @@ import { RemoteRepository } from "../../domain/repository/RemoteRepository";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient, Session } from "@supabase/supabase-js";
 import { UnexpectedError } from "../../domain/errors/UnexpectedError";
-import { sha512 } from "js-sha512";
 
 export class RemoteRepositoryImpl implements RemoteRepository {
     private supabaseUrl = "https://rtihkrdbkhmgzdyafyvq.supabase.co";
@@ -23,14 +22,14 @@ export class RemoteRepositoryImpl implements RemoteRepository {
             error: AuthError,
         } = await this.supabase.auth.signUp({
             email: emailAddress,
-            password: sha512(password),
+            password: password,
         });
 
         const { error: PostgresError } = await this.supabase.from("users").insert({
             full_name: fullName,
             phone_number: phoneNumber,
             email_address: emailAddress,
-            password: sha512(password),
+            password: password,
         });
 
         if (PostgresError || AuthError) {
@@ -43,7 +42,7 @@ export class RemoteRepositoryImpl implements RemoteRepository {
             error,
         } = await this.supabase.auth.signInWithPassword({
             email: emailAddress,
-            password: sha512(password),
+            password: password,
         });
 
         if (error) {
@@ -51,5 +50,44 @@ export class RemoteRepositoryImpl implements RemoteRepository {
         }
 
         return session;
+    }
+
+    async sendOtpCode(email: string) {
+        const { error } = await this.supabase.auth.resetPasswordForEmail(email);
+
+        console.log(error);
+        if (error) {
+            throw new UnexpectedError();
+        }
+    }
+
+    async otpVerification(email: string, code: string) {
+        const {
+            data: { session },
+            error,
+        } = await this.supabase.auth.verifyOtp({
+            email,
+            token: code,
+            type: "email",
+        });
+
+        if (error) {
+            throw new UnexpectedError();
+        }
+    }
+
+    async changePassword(email: string, newPassword: string) {
+        const { error } = await this.supabase.auth.updateUser({
+            password: newPassword,
+        });
+
+        const { error: PostgresError } = await this.supabase
+            .from("users")
+            .update({ password: newPassword })
+            .eq("email_address", email);
+
+        if (error) {
+            throw new UnexpectedError();
+        }
     }
 }
